@@ -11,11 +11,11 @@
 #   .\install.ps1                          # install latest release
 #   .\install.ps1 -Version v0.1.0          # install a specific release tag
 #   .\install.ps1 -FromSource              # force source build
-#   irm https://raw.githubusercontent.com/saikat/ds/main/install.ps1 | iex
+#   irm https://raw.githubusercontent.com/mirzasaikatahmmed/ds-cli/main/install.ps1 | iex
 #
 # Environment:
 #   DS_INSTALL_DIR       Override install directory (default: ~/.local/bin)
-#   DS_GITHUB_REPO       Override repo (default: saikat/ds)
+#   DS_GITHUB_REPO       Override repo (default: mirzasaikatahmmed/ds-cli)
 #   DS_SKIP_CHECKSUM     Set to "1" to skip checksum verification
 
 [CmdletBinding()]
@@ -28,7 +28,7 @@ param(
 $ErrorActionPreference = "Stop"
 
 if (-not $Repo) {
-    $Repo = if ($env:DS_GITHUB_REPO) { $env:DS_GITHUB_REPO } else { "saikat/ds" }
+    $Repo = if ($env:DS_GITHUB_REPO) { $env:DS_GITHUB_REPO } else { "mirzasaikatahmmed/ds-cli" }
 }
 
 $SkipChecksum = ($env:DS_SKIP_CHECKSUM -eq "1")

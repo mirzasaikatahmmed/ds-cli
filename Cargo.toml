@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 description = "Domain Search CLI - check domain availability over RDAP with WHOIS fallback"
 license = "MIT"
-repository = "https://github.com/saikat/ds"
+repository = "https://github.com/mirzasaikatahmmed/ds-cli"
 
 [dependencies]
 # CLI

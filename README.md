@@ -30,7 +30,7 @@ required on your machine, and the binary is ~3 MB.
 ### macOS / Linux (one-liner)
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/saikat/ds/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/mirzasaikatahmmed/ds-cli/main/install.sh | sh
 ```
 
 This downloads the matching prebuilt release, verifies the SHA-256 checksum,
@@ -41,14 +41,14 @@ per-user binaries).
 You can also pass a specific version or force a source build:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/saikat/ds/main/install.sh | sh -s -- --version v0.1.0
-curl -fsSL https://raw.githubusercontent.com/saikat/ds/main/install.sh | sh -s -- --from-source
+curl -fsSL https://raw.githubusercontent.com/mirzasaikatahmmed/ds-cli/main/install.sh | sh -s -- --version v0.1.0
+curl -fsSL https://raw.githubusercontent.com/mirzasaikatahmmed/ds-cli/main/install.sh | sh -s -- --from-source
 ```
 
 ### Windows (PowerShell)
 
 ```powershell
-irm https://raw.githubusercontent.com/saikat/ds/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/mirzasaikatahmmed/ds-cli/main/install.ps1 | iex
 ```
 
 Same flow: prebuilt `ds.exe` first, `rustup` fallback only if no matching
@@ -59,7 +59,7 @@ binary is available.
 If you already have Rust installed:
 
 ```sh
-cargo install --git https://github.com/saikat/ds
+cargo install --git https://github.com/mirzasaikatahmmed/ds-cli
 ```
 
 ---

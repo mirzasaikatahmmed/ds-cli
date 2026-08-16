@@ -16,14 +16,14 @@
 #
 # Environment:
 #   DS_INSTALL_DIR       Override install directory (default: ~/.local/bin)
-#   DS_GITHUB_REPO       Override repo (default: saikat/ds)
+#   DS_GITHUB_REPO       Override repo (default: mirzasaikatahmmed/ds-cli)
 #   DS_SKIP_CHECKSUM     Set to 1 to skip checksum verification
 #
 # Set -eu (treat unset vars as errors, exit on first failure).
 
 set -eu
 
-REPO="${DS_GITHUB_REPO:-saikat/ds}"
+REPO="${DS_GITHUB_REPO:-mirzasaikatahmmed/ds-cli}"
 VERSION=""
 FROM_SOURCE=0
 SKIP_CHECKSUM="${DS_SKIP_CHECKSUM:-0}"
