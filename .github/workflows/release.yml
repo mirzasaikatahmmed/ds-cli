@@ -1,0 +1,129 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    name: Build (${{ matrix.target }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            archive: tar.gz
+            bin_name: ds
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            archive: tar.gz
+            bin_name: ds
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            archive: tar.gz
+            bin_name: ds
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            archive: zip
+            bin_name: ds.exe
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Add Rust target
+        run: rustup target add ${{ matrix.target }}
+
+      - name: Build release binary
+        run: cargo build --release --target ${{ matrix.target }} --locked
+
+      - name: Locate binary
+        id: locate
+        shell: bash
+        run: |
+          set -e
+          BIN_PATH="target/${{ matrix.target }}/release/${{ matrix.bin_name }}"
+          if [ ! -f "$BIN_PATH" ]; then
+            echo "expected binary at $BIN_PATH, not found" >&2
+            ls -la "target/${{ matrix.target }}/release/" >&2 || true
+            exit 1
+          fi
+          echo "bin_path=$BIN_PATH" >> "$GITHUB_OUTPUT"
+
+      - name: Compute SHA-256
+        id: hash
+        shell: bash
+        run: |
+          set -e
+          BIN="${{ steps.locate.outputs.bin_path }}"
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            HASH=$(sha256sum "$BIN" | awk '{print $1}')
+          else
+            HASH=$(shasum -a 256 "$BIN" | awk '{print $1}')
+          fi
+          echo "hash=$HASH" >> "$GITHUB_OUTPUT"
+
+      - name: Package archive
+        shell: bash
+        run: |
+          set -e
+          BIN="${{ steps.locate.outputs.bin_path }}"
+          BIN_NAME=${{ matrix.bin_name }}
+          TARGET=${{ matrix.target }}
+          ARCHIVE=ds-$TARGET.${{ matrix.archive }}
+
+          if [ "${{ matrix.archive }}" = "tar.gz" ]; then
+            mkdir -p "dist/ds-$TARGET"
+            cp "$BIN" "dist/ds-$TARGET/$BIN_NAME"
+            # Ship README + LICENSE so users have docs even without internet.
+            cp README.md "dist/ds-$TARGET/" 2>/dev/null || true
+            cp LICENSE "dist/ds-$TARGET/" 2>/dev/null || true
+            tar -C dist -czf "dist/$ARCHIVE" "ds-$TARGET"
+          else
+            # zip for Windows
+            7z a "dist/$ARCHIVE" "$BIN" 2>/dev/null || \
+              (cd "$(dirname "$BIN")" && zip -j "../../dist/$ARCHIVE" "$BIN_NAME")
+          fi
+          echo "archive=$ARCHIVE" >> "$GITHUB_OUTPUT"
+
+      - name: Upload to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/${{ steps.package.outputs.archive }}
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  checksums:
+    name: Generate SHASUMS256.txt
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+      - name: Compute checksums
+        shell: bash
+        run: |
+          set -e
+          cd dist
+          for f in *; do
+            if [ -f "$f" ]; then
+              sha256sum "$f" >> SHASUMS256.txt
+            fi
+          done
+          cat SHASUMS256.txt
+      - name: Upload SHASUMS256.txt
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/SHASUMS256.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

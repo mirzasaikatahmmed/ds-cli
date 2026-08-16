@@ -1,0 +1,49 @@
+[package]
+name = "ds"
+version = "0.1.0"
+edition = "2021"
+description = "Domain Search CLI - check domain availability over RDAP with WHOIS fallback"
+license = "MIT"
+repository = "https://github.com/saikat/ds"
+
+[dependencies]
+# CLI
+clap = { version = "4.5", features = ["derive"] }
+
+# Async runtime
+tokio = { version = "1.40", features = ["full"] }
+
+# HTTP client (rustls-only, no OpenSSL)
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# CSV export
+csv = "1.3"
+
+# Async traits
+async-trait = "0.1"
+
+# Output
+owo-colors = { version = "4.0", features = ["supports-colors"] }
+
+# Config dir
+directories = "5.0"
+
+[dev-dependencies]
+wiremock = "0.6"
+tokio = { version = "1.40", features = ["full", "test-util"] }
+tempfile = "3.10"
+
+[profile.release]
+strip = true
+lto = true
+opt-level = "z"
+codegen-units = 1
+panic = "abort"
